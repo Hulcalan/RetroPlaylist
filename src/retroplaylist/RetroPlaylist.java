@@ -19,8 +19,9 @@ public class RetroPlaylist {
      */
     public static void main(String[] args) throws IOException {
         // TODO code application logic here
-        
-        Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd lib && java -jar HelloWorldApp.jar\"");
+        //clean this up
+        Runtime.getRuntime().exec("cmd /c start cmd.exe /K \"cd .. && cd PlaylistDriver "
+                + "&&cd dist && java -jar PlaylistDriver.jar\"");
     }
     
 }
