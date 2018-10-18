@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.Scanner;
 
 /**
@@ -40,14 +39,16 @@ public class PlaylistDriver {
 
             //appends all entries into one string
             for (String files : fileNames) {
-                output = output + listEntry(files,1, 1, 1) +"\r\n";
+                output = output + listEntry(files,0, 8, 6) +"\r\n";
             }
 
-            System.out.println(output);
-            PrintWriter writer = new PrintWriter("output/" + consoleSelect(1) + ".lpl");
-            writer.println(output);
-            writer.close();
-            //Runtime.getRuntime().exec("taskkill /f /im cmd.exe");
+            //System.out.println(output);
+            
+            //add system to either console name or manual name for playlist.
+            try (PrintWriter writer = new PrintWriter("output/" + consoleSelect(8)[0] + ".lpl")) {
+                writer.println(output);
+                //Runtime.getRuntime().exec("taskkill /f /im cmd.exe");
+            }
         } catch (FileNotFoundException e) {
             System.out.println("The path \"" + pathName + "\" doesn't exist");
             e.printStackTrace();
@@ -79,7 +80,8 @@ public class PlaylistDriver {
      * @return a list of files in the selected directory
      */
     public static String listEntry(String gameName,int manual, int console, int core) {
-        String entry, truncName, consoleName, coreName;
+        String entry, truncName, coreName;
+        String[] consoleName;
         int count;
         Scanner scan = new Scanner(System.in);
 
@@ -94,29 +96,67 @@ public class PlaylistDriver {
             truncName = gameName.substring(0, count);
             //manually enter for arcade games.
         } else {
+            System.out.println("\n" + gameName + "\n");
             truncName = scan.nextLine();
         }
         //System.out.println(truncName);
 
-        entry = "/roms/nes/" + gameName
+        entry = "/roms/" + consoleName[1] + "/" + gameName
                 + "\r\n" + truncName
-                + "\r\n/retoarch/cores/" + coreName
-                + "\r\n" + consoleName
+                + "\r\n/retroarch/cores/" + coreName
+                + "\r\n" + consoleName[1] 
                 + "\r\nDETECT"
-                + "\r\n" + consoleName + ".lpl";
+                + "\r\n" + consoleName[0] + ".lpl";
         return entry;
     }
 
-    public static String consoleSelect(int consoleSelect) {
-        String consoleName;
+    public static String[] consoleSelect(int consoleSelect) {
+        String[] consoleName = new String[2];
         //System.out.println("In method consoleSelect(int) " + consoleSelect);
         //console selector
         switch (consoleSelect) {
             case 1:
-                consoleName = "Nintendo - Nintendo Entertainment System";
+                consoleName[0] = "Nintendo - Nintendo Entertainment System";
+                consoleName[1] = "nes";
+            case 2:
+                consoleName[0] = "Nintendo - Super Nintendo Entertainment System";
+                consoleName[1] = "snes";
                 break;
+            case 3:
+                consoleName[0] = "Nintendo - Game Boy";
+                consoleName[1] = "gb";
+                break;
+            case 4:
+                consoleName[0] = "Nintendo - Game Boy Color";
+                consoleName[1] = "gbc";
+                break;
+            case 5:
+                consoleName[0] = "Nintendo - Game Boy Advance";
+                consoleName[1] = "gba";
+                break;
+            case 6:
+                consoleName[0] = "Nintendo - Nintendo 64";
+                consoleName[1] = "n64";
+                break;
+            case 7:
+                consoleName[0] = "Sega - Mega Drive - Genesis";
+                consoleName[1] = "gen";
+                break;
+            case 8:
+                consoleName[0] = "Sony - PlayStation";
+                consoleName[1] = "psx";
+                break;
+            case 9:
+                consoleName[0] = "FB Alpha - Arcade Games";
+                consoleName[1] = "fba";
+                break;
+            case 10:
+                consoleName[0] = "MAME";
+                consoleName[1] = "mame2003";
+                break;
+                
             default:
-                consoleName = "unknown";
+                consoleName[0] = "unknown";
                 break;
         }
         return consoleName;
@@ -129,7 +169,40 @@ public class PlaylistDriver {
         //console selector
         switch (coreSelect) {
             case 1:
+                //nes
                 coreName = "fceumm_libretro_libnx.nro";
+                break;
+            case 2:
+                //fbalpha
+                coreName = "fbalpha_libretro_libnx.nro";
+                break;
+            case 3:
+                //gb and gbc
+                coreName = "gearboy_libretro_libnx.nro";
+                break;
+            case 4:
+                //mame2003
+                coreName = "mame2003_libretro_libnx.nro";
+                break;
+            case 5:
+                //n64
+                coreName = "mupen64plus_libretro_libnx.nro";
+                break;
+            case 6:
+                //psx
+                coreName = "pcsx_rearmed_libretro_libnx.nro";
+                break;
+            case 7:
+                //sega genesis
+                coreName = "picodrive_libretro_libnx.nro";
+                break;
+            case 8:
+                //snes
+                coreName = "snes9x2010_libretro_libnx.nro";
+                break;
+            case 9:
+                //gba
+                coreName = "vba_next_libretro_libnx.nro";
                 break;
             default:
                 coreName = "unknown";
@@ -157,6 +230,7 @@ public class PlaylistDriver {
                     && count != gameName.length() - 1) {
                 count++;
             } else if (gameName.charAt(count) == '(') {
+                count--;
                 exit = 1;
             } else {
                 count++;
